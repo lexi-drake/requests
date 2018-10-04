@@ -14,7 +14,7 @@ type RequestHandler struct {
 type RequestHeaders map[string]string
 type RequestBody map[string]string
 
-func (requestHandler *RequestHandler) Get(url string, headers RequestHeaders, result interface{}) (int, string, error) {
+func (requestHandler *RequestHandler) Get(url string, headers RequestHeaders) (int, string, error) {
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return -1, "", err
@@ -23,7 +23,7 @@ func (requestHandler *RequestHandler) Get(url string, headers RequestHeaders, re
 	return requestHandler.Send(request, headers)
 }
 
-func (requestHandler *RequestHandler) Post(targetUrl string, headers RequestHeaders, body RequestBody ) (int, string, error) {
+func (requestHandler *RequestHandler) Post(targetUrl string, headers RequestHeaders, body RequestBody) (int, string, error) {
 	jsonValue, err := json.Marshal(body)
 	if err != nil {
 		return -1, "", err
