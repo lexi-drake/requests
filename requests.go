@@ -1,14 +1,10 @@
 package main
 
 import(
-//	"bytes"
 	"encoding/json"
-//	"fmt"
-//	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
-//	"net/http/httputil"
 	"strings"
 )
 
@@ -31,7 +27,7 @@ func (requestHandler *RequestHandler) Get(url string, headers RequestHeaders, re
 func (requestHandler *RequestHandler) Post(targetUrl string, headers RequestHeaders, body RequestBody ) (int, string, error) {
 	jsonValue, err := json.Marshal(body)
 	if err != nil {
-		log.Fatal(err)
+		return -1, "", err
 	}
 
 	request, err := http.NewRequest("POST", targetUrl,strings.NewReader(string(jsonValue)))
