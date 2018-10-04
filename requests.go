@@ -3,7 +3,6 @@ package requests
 import(
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 )
