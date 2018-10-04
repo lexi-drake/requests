@@ -4,6 +4,14 @@ A library for making http requests in go
 
 ## Usage ##
 
+Get the library
+
+```bash
+go get github.com/lexi-drake/requests
+```
+
+Make requests
+
 ```go
 url := "http://localhost:8080"
 r := RequestHandler{}
