@@ -13,6 +13,12 @@ go get github.com/lexi-drake/requests
 Make requests
 
 ```go
+import(
+	requests "github.com/lexi-drake/requests"
+)
+
+...
+
 url := "http://localhost:8080"
 r := RequestHandler{}
 headers := RequestHeaders{"key": "value"}
