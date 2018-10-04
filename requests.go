@@ -59,3 +59,5 @@ func (requestHandler *RequestHandler) Send(request *http.Request, headers Reques
 	body := string(responseBody)
 	return response.StatusCode, body, nil
 }
+
+func main {}
