@@ -1,6 +1,7 @@
 package requests
 
 import(
+	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -34,7 +35,7 @@ func (requestHandler *RequestHandler) Post(targetUrl string, headers RequestHead
 
 	request, err := http.NewRequest("POST", targetUrl,strings.NewReader(string(jsonValue)))
 	if err != nil {
-		return -1, httpstat.Result{}, err101
+		return -1, httpstat.Result{}, err
 		
 	}
 	
