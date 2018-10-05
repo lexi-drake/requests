@@ -69,13 +69,13 @@ func (requestHandler *RequestHandler) Send(request *http.Request, headers Reques
 	return Response{response.StatusCode, stats, responseBody}, err
 }
 
-func (response *Response) FromJson(result interface{}) error {
+func (response *Response) BodyAsObject(result interface{}) error {
 	reader := bytes.NewReader(response.body)
 	err := json.NewDecoder(reader).Decode(result)
 	return err
 }
 
-func (response *Response) BodyString() string {
+func (response *Response) BodyAsString() string {
 	return string(response.body)
 }
 
