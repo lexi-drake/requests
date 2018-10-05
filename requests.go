@@ -59,6 +59,6 @@ func (requestHandler *RequestHandler) Send(request *http.Request, headers Reques
 	defer response.Body.Close()
 
 	responseBody, _ := ioutil.ReadAll(response.Body)
-	json.NewDecoder(responseBody).Decode(result)
+	json.NewDecoder(bytes.NewReader(responseBody)).Decode(result)
 	return response.StatusCode, stats, nil
 }
