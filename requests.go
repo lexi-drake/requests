@@ -17,32 +17,38 @@ type RequestHandler struct {
 type RequestHeaders map[string]string
 type RequestBody map[string]string
 
-func (requestHandler *RequestHandler) Get(url string, headers RequestHeaders, result interface{}) (int, httpstat.Result, error) {
+type Response struct {
+	StatusCode int
+	Stats httpstat.Result
+	body []byte
+}
+
+func (requestHandler *RequestHandler) Get(url string, headers RequestHeaders) (Response, error) {
 	request, err := http.NewRequest("GET", url, nil)
 	
 	if err != nil {
-		return -1, httpstat.Result{}, err
+		return Response{-1, httpstat.Result{}, []byte{}},  err
 	}
 
-	return requestHandler.Send(request, headers, result)
+	return requestHandler.Send(request, headers)
 }
 
-func (requestHandler *RequestHandler) Post(targetUrl string, headers RequestHeaders, body RequestBody, result interface{}) (int, httpstat.Result, error) {
+func (requestHandler *RequestHandler) Post(targetUrl string, headers RequestHeaders, body RequestBody) (Response, error) {
 	jsonValue, err := json.Marshal(body)
 	if err != nil {
-		return -1, httpstat.Result{}, err
+		return Response{-1, httpstat.Result{}, []byte{}}, err
 	}
 
 	request, err := http.NewRequest("POST", targetUrl,strings.NewReader(string(jsonValue)))
 	if err != nil {
-		return -1, httpstat.Result{}, err
+		return Response{-1, httpstat.Result{}, []byte{}}, err
 		
 	}
 	
-	return requestHandler.Send(request, headers, result)
+	return requestHandler.Send(request, headers)
 }
 
-func (requestHandler *RequestHandler) Send(request *http.Request, headers RequestHeaders, result interface{}) (int, httpstat.Result, error) {
+func (requestHandler *RequestHandler) Send(request *http.Request, headers RequestHeaders) (Response, error) {
 	for key, value := range headers {
 		request.Header.Set(key, value)
 	}
@@ -54,12 +60,23 @@ func (requestHandler *RequestHandler) Send(request *http.Request, headers Reques
 	client := http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		return -1, stats, err
+		return Response{-1, stats, []byte{}}, err
 	}
 
 	defer response.Body.Close()
 
-	responseBody, _ := ioutil.ReadAll(response.Body)
-	json.NewDecoder(bytes.NewReader(responseBody)).Decode(result)
-	return response.StatusCode, stats, nil
+	responseBody, err := ioutil.ReadAll(response.Body)
+	return Response{response.StatusCode, stats, responseBody}, err
 }
+
+func (response *Response) FromJson(result interface{}) error {
+	reader := bytes.NewReader(response.body)
+	err := json.NewDecoder(reader).Decode(result)
+	return err
+}
+
+func (response *Response) BodyString() string {
+	return string(response.body)
+}
+
+	
