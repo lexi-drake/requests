@@ -15,7 +15,6 @@ type RequestHandler struct {
 }
 
 type RequestHeaders map[string]string
-type RequestBody map[string]string
 
 func (requestHandler *RequestHandler) Head(url string, headers RequestHeaders) (Response, error) {
 	return requestHandler.sendWithoutData("HEAD", url, headers)
@@ -38,19 +37,19 @@ func (requestHandler *RequestHandler) sendWithoutData(verb string, url string, h
 	return requestHandler.Send(request, headers)
 }
 
-func (requestHandler *RequestHandler) Post(url string, headers RequestHeaders, body RequestBody) (Response, error) {
+func (requestHandler *RequestHandler) Post(url string, headers RequestHeaders, body interface{}) (Response, error) {
 	return requestHandler.sendWithData("POST", url, headers, body)
 }
 
-func (requestHandler *RequestHandler) Put(url string, headers RequestHeaders, body RequestBody) (Response, error) {
+func (requestHandler *RequestHandler) Put(url string, headers RequestHeaders, body interface{}) (Response, error) {
 	return requestHandler.sendWithData("PUT", url, headers, body)
 }
 
-func (requestHandler *RequestHandler) Patch(url string, headers RequestHeaders, body RequestBody) (Response, error) {
+func (requestHandler *RequestHandler) Patch(url string, headers RequestHeaders, body interface{}) (Response, error) {
 	return requestHandler.sendWithData("PATCH", url, headers, body)
 }
 
-func (requestHandler *RequestHandler) sendWithData(verb string, url string, headers RequestHeaders, body RequestBody) (Response, error) {
+func (requestHandler *RequestHandler) sendWithData(verb string, url string, headers RequestHeaders, body interface{}) (Response, error) {
 	jsonValue, err := json.Marshal(body)
 	if err != nil {
 		return Response{-1, httpstat.Result{}, []byte{}, time.Now()}, err
