@@ -5,7 +5,8 @@ import(
 	"io/ioutil"
 	"net/http"
 	"strings"
-
+	"time"
+	
 	"github.com/tcnksm/go-httpstat"
 )
 
@@ -31,7 +32,7 @@ func (requestHandler *RequestHandler) Delete(url string, headers RequestHeaders)
 func (requestHandler *RequestHandler) sendWithoutData(verb string, url string, headers RequestHeaders) (Response, error) {
 	request, err := http.NewRequest(verb, url, nil)
 	if err != nil {
-		return Response{-1, httpstat.Result{}, []byte{}},  err
+		return Response{-1, httpstat.Result{}, []byte{}, time.Now()},  err
 	}
 
 	return requestHandler.Send(request, headers)
@@ -52,12 +53,12 @@ func (requestHandler *RequestHandler) Patch(url string, headers RequestHeaders, 
 func (requestHandler *RequestHandler) sendWithData(verb string, url string, headers RequestHeaders, body RequestBody) (Response, error) {
 	jsonValue, err := json.Marshal(body)
 	if err != nil {
-		return Response{-1, httpstat.Result{}, []byte{}}, err
+		return Response{-1, httpstat.Result{}, []byte{}, time.Now()}, err
 	}
 
 	request, err := http.NewRequest(verb, url, strings.NewReader(string(jsonValue)))
 	if err != nil {
-		return Response{-1, httpstat.Result{}, []byte{}}, err
+		return Response{-1, httpstat.Result{}, []byte{}, time.Now()}, err
 		
 	}
 	
@@ -72,17 +73,18 @@ func (requestHandler *RequestHandler) Send(request *http.Request, headers Reques
 	var stats httpstat.Result
 	context := httpstat.WithHTTPStat(request.Context(), &stats)
 	request = request.WithContext(context)
-		
+
+	t := time.Now()
 	client := http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		return Response{-1, stats, []byte{}}, err
+		return Response{-1, stats, []byte{}, t}, err
 	}
 
 	defer response.Body.Close()
 
 	responseBody, err := ioutil.ReadAll(response.Body)
-	return Response{response.StatusCode, stats, responseBody}, err
+	return Response{response.StatusCode, stats, responseBody, t}, err
 }
 
 
