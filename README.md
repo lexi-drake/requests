@@ -14,6 +14,7 @@ Make requests
 
 ```go
 import(
+	"fmt"
 	requests "github.com/lexi-drake/requests"
 )
 
@@ -24,8 +25,14 @@ r := RequestHandler{}
 headers := RequestHeaders{"key": "value"}
 body := RequestBody { "foo": "bar", "one": "a"}
 
-status, response, err := r.Post(url, headers, body)
+response, err := r.Post(url, headers, body)
 if err != nil {
 	// handle error
 }
+
+// for html responses
+fmt.Println(response.BodyAsString())
+
+// for json responses
+err = response.BodyAsObject(yourObject)
 ```
