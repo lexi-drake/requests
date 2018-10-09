@@ -1,7 +1,6 @@
 package requests
 
 import(
-	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -17,15 +16,20 @@ type RequestHandler struct {
 type RequestHeaders map[string]string
 type RequestBody map[string]string
 
-type Response struct {
-	StatusCode int
-	Stats httpstat.Result
-	body []byte
+func (requestHandler *RequestHandler) Head(url string, headers RequestHeaders) (Response, error) {
+	return requestHandler.sendWithoutData("HEAD", url, headers)
+}
+	
+func (requestHandler *RequestHandler) Get(url string, headers RequestHeaders) (Response, error) {
+	return requestHandler.sendWithoutData("GET", url, headers)
 }
 
-func (requestHandler *RequestHandler) Get(url string, headers RequestHeaders) (Response, error) {
-	request, err := http.NewRequest("GET", url, nil)
-	
+func (requestHandler *RequestHandler) Delete(url string, headers RequestHeaders) (Response, error) {
+	return requestHandler.sendWithoutData("DELETE", url, headers)
+}
+
+func (requestHandler *RequestHandler) sendWithoutData(verb string, url string, headers RequestHeaders) (Response, error) {
+	request, err := http.NewRequest(verb, url, nil)
 	if err != nil {
 		return Response{-1, httpstat.Result{}, []byte{}},  err
 	}
@@ -33,13 +37,25 @@ func (requestHandler *RequestHandler) Get(url string, headers RequestHeaders) (R
 	return requestHandler.Send(request, headers)
 }
 
-func (requestHandler *RequestHandler) Post(targetUrl string, headers RequestHeaders, body RequestBody) (Response, error) {
+func (requestHandler *RequestHandler) Post(url string, headers RequestHeaders, body RequestBody) (Response, error) {
+	return requestHandler.sendWithData("POST", url, headers, body)
+}
+
+func (requestHandler *RequestHandler) Put(url string, headers RequestHeaders, body RequestBody) (Response, error) {
+	return requestHandler.sendWithData("PUT", url, headers, body)
+}
+
+func (requestHandler *RequestHandler) Patch(url string, headers RequestHeaders, body RequestBody) (Response, error) {
+	return requestHandler.sendWithData("PATCH", url, headers, body)
+}
+
+func (requestHandler *RequestHandler) sendWithData(verb string, url string, headers RequestHeaders, body RequestBody) (Response, error) {
 	jsonValue, err := json.Marshal(body)
 	if err != nil {
 		return Response{-1, httpstat.Result{}, []byte{}}, err
 	}
 
-	request, err := http.NewRequest("POST", targetUrl,strings.NewReader(string(jsonValue)))
+	request, err := http.NewRequest(verb, url, strings.NewReader(string(jsonValue)))
 	if err != nil {
 		return Response{-1, httpstat.Result{}, []byte{}}, err
 		
@@ -69,14 +85,5 @@ func (requestHandler *RequestHandler) Send(request *http.Request, headers Reques
 	return Response{response.StatusCode, stats, responseBody}, err
 }
 
-func (response *Response) BodyAsObject(result interface{}) error {
-	reader := bytes.NewReader(response.body)
-	err := json.NewDecoder(reader).Decode(result)
-	return err
-}
-
-func (response *Response) BodyAsString() string {
-	return string(response.body)
-}
 
 	
