@@ -13,15 +13,15 @@ import(
 type RequestHeaders map[string]string
 
 func Head(url string, headers RequestHeaders) (Response, error) {
-	return requestHandler.sendWithoutData("HEAD", url, headers)
+	return sendWithoutData("HEAD", url, headers)
 }
 	
 func Get(url string, headers RequestHeaders) (Response, error) {
-	return requestHandler.sendWithoutData("GET", url, headers)
+	return sendWithoutData("GET", url, headers)
 }
 
 func Delete(url string, headers RequestHeaders) (Response, error) {
-	return requestHandler.sendWithoutData("DELETE", url, headers)
+	return sendWithoutData("DELETE", url, headers)
 }
 
 func sendWithoutData(verb string, url string, headers RequestHeaders) (Response, error) {
@@ -30,19 +30,19 @@ func sendWithoutData(verb string, url string, headers RequestHeaders) (Response,
 		return Response{-1, httpstat.Result{}, []byte{}, time.Now()},  err
 	}
 
-	return requestHandler.Send(request, headers)
+	return Send(request, headers)
 }
 
 func Post(url string, headers RequestHeaders, body interface{}) (Response, error) {
-	return requestHandler.sendWithData("POST", url, headers, body)
+	return sendWithData("POST", url, headers, body)
 }
 
 func Put(url string, headers RequestHeaders, body interface{}) (Response, error) {
-	return requestHandler.sendWithData("PUT", url, headers, body)
+	return sendWithData("PUT", url, headers, body)
 }
 
 func Patch(url string, headers RequestHeaders, body interface{}) (Response, error) {
-	return requestHandler.sendWithData("PATCH", url, headers, body)
+	return sendWithData("PATCH", url, headers, body)
 }
 
 func sendWithData(verb string, url string, headers RequestHeaders, body interface{}) (Response, error) {
@@ -57,7 +57,7 @@ func sendWithData(verb string, url string, headers RequestHeaders, body interfac
 		
 	}
 	
-	return requestHandler.Send(request, headers)
+	return Send(request, headers)
 }
 
 func Send(request *http.Request, headers RequestHeaders) (Response, error) {
