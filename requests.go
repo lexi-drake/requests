@@ -10,25 +10,21 @@ import(
 	"github.com/tcnksm/go-httpstat"
 )
 
-type RequestHandler struct {
-	
-}
-
 type RequestHeaders map[string]string
 
-func (requestHandler *RequestHandler) Head(url string, headers RequestHeaders) (Response, error) {
+func Head(url string, headers RequestHeaders) (Response, error) {
 	return requestHandler.sendWithoutData("HEAD", url, headers)
 }
 	
-func (requestHandler *RequestHandler) Get(url string, headers RequestHeaders) (Response, error) {
+func Get(url string, headers RequestHeaders) (Response, error) {
 	return requestHandler.sendWithoutData("GET", url, headers)
 }
 
-func (requestHandler *RequestHandler) Delete(url string, headers RequestHeaders) (Response, error) {
+func Delete(url string, headers RequestHeaders) (Response, error) {
 	return requestHandler.sendWithoutData("DELETE", url, headers)
 }
 
-func (requestHandler *RequestHandler) sendWithoutData(verb string, url string, headers RequestHeaders) (Response, error) {
+func sendWithoutData(verb string, url string, headers RequestHeaders) (Response, error) {
 	request, err := http.NewRequest(verb, url, nil)
 	if err != nil {
 		return Response{-1, httpstat.Result{}, []byte{}, time.Now()},  err
@@ -37,19 +33,19 @@ func (requestHandler *RequestHandler) sendWithoutData(verb string, url string, h
 	return requestHandler.Send(request, headers)
 }
 
-func (requestHandler *RequestHandler) Post(url string, headers RequestHeaders, body interface{}) (Response, error) {
+func Post(url string, headers RequestHeaders, body interface{}) (Response, error) {
 	return requestHandler.sendWithData("POST", url, headers, body)
 }
 
-func (requestHandler *RequestHandler) Put(url string, headers RequestHeaders, body interface{}) (Response, error) {
+func Put(url string, headers RequestHeaders, body interface{}) (Response, error) {
 	return requestHandler.sendWithData("PUT", url, headers, body)
 }
 
-func (requestHandler *RequestHandler) Patch(url string, headers RequestHeaders, body interface{}) (Response, error) {
+func Patch(url string, headers RequestHeaders, body interface{}) (Response, error) {
 	return requestHandler.sendWithData("PATCH", url, headers, body)
 }
 
-func (requestHandler *RequestHandler) sendWithData(verb string, url string, headers RequestHeaders, body interface{}) (Response, error) {
+func sendWithData(verb string, url string, headers RequestHeaders, body interface{}) (Response, error) {
 	jsonValue, err := json.Marshal(body)
 	if err != nil {
 		return Response{-1, httpstat.Result{}, []byte{}, time.Now()}, err
@@ -64,7 +60,7 @@ func (requestHandler *RequestHandler) sendWithData(verb string, url string, head
 	return requestHandler.Send(request, headers)
 }
 
-func (requestHandler *RequestHandler) Send(request *http.Request, headers RequestHeaders) (Response, error) {
+func Send(request *http.Request, headers RequestHeaders) (Response, error) {
 	for key, value := range headers {
 		request.Header.Set(key, value)
 	}
