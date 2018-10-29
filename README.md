@@ -18,14 +18,18 @@ import(
 	requests "github.com/lexi-drake/requests"
 )
 
+// the json tag is required for serialization into a json object
+type MyData struct {
+     Name string `json:"name"`
+     Info int `json:"info"`
+}
 ...
 
 url := "http://localhost:8080"
-r := RequestHandler{}
-headers := RequestHeaders{"key": "value"}
-body := RequestBody { "foo": "bar", "one": "a"}
+headers := requests.RequestHeaders{"key": "value"}
 
-response, err := r.Post(url, headers, body)
+body := MyData {"Alexa", 11}
+response, err := requests.Post(url, headers, body)
 if err != nil {
 	// handle error
 }
