@@ -11,6 +11,14 @@ import(
 )
 
 type RequestHeaders map[string]string
+func (h RequestHeaders) contains(key string) bool {
+	for _, h := range h {
+		if h == key {
+			return true
+		}
+	}
+	return false
+}
 
 func Head(url string, headers RequestHeaders) (Response, error) {
 	return sendWithoutData("HEAD", url, headers)
