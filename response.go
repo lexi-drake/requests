@@ -5,6 +5,7 @@ import(
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 	
 	"github.com/tcnksm/go-httpstat"
@@ -13,20 +14,24 @@ import(
 type Response struct {
 	StatusCode int
 	Stats httpstat.Result
-	header RequestHeaders
+	header http.Header
 	body []byte
 	Time time.Time
 }
 
-func (response *Response) GetHeaderValue(string key) (string, error) {
-	if response.header.contains(key) {
-		return response.header[key], nil
-	}
-	return "", errors.New(fmt.Sprintf("header key %s does not exist in response headers", key))
+func containsKey(headers http.Header, key string) bool {
+	return headers.Get(key) != ""
 }
 
-func (response *Response) GetHeaders() RequestHeaders {
-	return response.headers
+func (response *Response) GetHeaderValue(key string) ([]string, error) {
+	if containsKey(response.header, key) {
+		return response.header[key], nil
+	}
+	return []string{}, errors.New(fmt.Sprintf("header key %s does not exist in response headers", key))
+}
+
+func (response *Response) GetHeader() http.Header {
+	return response.header
 }
 
 func (response *Response) BodyAsObject(result interface{}) error {

@@ -10,68 +10,56 @@ import(
 	"github.com/tcnksm/go-httpstat"
 )
 
-type RequestHeaders map[string]string
-func (h RequestHeaders) contains(key string) bool {
-	for _, h := range h {
-		if h == key {
-			return true
-		}
-	}
-	return false
-}
-
-func Head(url string, headers RequestHeaders) (Response, error) {
+func Head(url string, headers http.Header) (Response, error) {
 	return sendWithoutData("HEAD", url, headers)
 }
 	
-func Get(url string, headers RequestHeaders) (Response, error) {
+func Get(url string, headers http.Header) (Response, error) {
 	return sendWithoutData("GET", url, headers)
 }
 
-func Delete(url string, headers RequestHeaders) (Response, error) {
+func Delete(url string, headers http.Header) (Response, error) {
 	return sendWithoutData("DELETE", url, headers)
 }
 
-func sendWithoutData(verb string, url string, headers RequestHeaders) (Response, error) {
+func sendWithoutData(verb string, url string, headers http.Header) (Response, error) {
 	request, err := http.NewRequest(verb, url, nil)
 	if err != nil {
-		return Response{-1, httpstat.Result{}, []byte{}, time.Now()},  err
+		return Response{},  err
 	}
 
 	return Send(request, headers)
 }
 
-func Post(url string, headers RequestHeaders, body interface{}) (Response, error) {
+func Post(url string, headers http.Header, body interface{}) (Response, error) {
 	return sendWithData("POST", url, headers, body)
 }
 
-func Put(url string, headers RequestHeaders, body interface{}) (Response, error) {
+func Put(url string, headers http.Header, body interface{}) (Response, error) {
 	return sendWithData("PUT", url, headers, body)
 }
 
-func Patch(url string, headers RequestHeaders, body interface{}) (Response, error) {
+func Patch(url string, headers http.Header, body interface{}) (Response, error) {
 	return sendWithData("PATCH", url, headers, body)
 }
 
-func sendWithData(verb string, url string, headers RequestHeaders, body interface{}) (Response, error) {
+func sendWithData(verb string, url string, headers http.Header, body interface{}) (Response, error) {
 	jsonValue, err := json.Marshal(body)
 	if err != nil {
-		return Response{-1, httpstat.Result{}, []byte{}, time.Now()}, err
+		return Response{}, err
 	}
 
 	request, err := http.NewRequest(verb, url, strings.NewReader(string(jsonValue)))
 	if err != nil {
-		return Response{-1, httpstat.Result{}, []byte{}, time.Now()}, err
+		return Response{}, err
 		
 	}
 	
 	return Send(request, headers)
 }
 
-func Send(request *http.Request, headers RequestHeaders) (Response, error) {
-	for key, value := range headers {
-		request.Header.Set(key, value)
-	}
+func Send(request *http.Request, headers http.Header) (Response, error) {
+	request.Header = headers;
 	
 	var stats httpstat.Result
 	context := httpstat.WithHTTPStat(request.Context(), &stats)
@@ -81,13 +69,13 @@ func Send(request *http.Request, headers RequestHeaders) (Response, error) {
 	client := http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		return Response{-1, stats, []byte{}, t}, err
+		return Response{}, err
 	}
 
 	defer response.Body.Close()
 
 	responseBody, err := ioutil.ReadAll(response.Body)
-	return Response{response.StatusCode, stats, responseBody, t}, err
+	return Response{response.StatusCode, stats, response.Header, responseBody, t}, err
 }
 
 
